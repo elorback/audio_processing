@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Card } from 'react-bootstrap';
+import * as XLSX from 'xlsx';
 
 function ExcelSheet() {
   const [data, setData] = useState([]);
@@ -29,7 +30,12 @@ function ExcelSheet() {
     }
   };
 
-
+  const exportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
+    XLSX.writeFile(workbook, 'excel_sheet.xlsx');
+  };
   
 
   const handleFileChange = (e) => {
@@ -56,6 +62,11 @@ function ExcelSheet() {
             Upload
           </Button>
         </Card.Body>
+        {data.length !== 0 ?
+        <Card.Footer> 
+          <Button onClick={exportToExcel}> Export to Excel</Button>
+        </Card.Footer> : null }
+
       </Card>
       <div>
   {data.map((_data, index) => (
@@ -68,6 +79,7 @@ function ExcelSheet() {
       </Card.Body>
     </Card>
   ))}
+
 </div>
 
     </div>
