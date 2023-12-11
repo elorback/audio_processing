@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Table } from 'react-bootstrap';
 import * as XLSX from 'xlsx';
 
 function ExcelSheet() {
@@ -21,8 +21,8 @@ function ExcelSheet() {
         if (!response.ok) {
           throw new Error('Could not post data');
         }
-  console.log(inputData)
-        const dataOutput = await response.json(); // Use await to get the JSON data
+  
+        const dataOutput = await response.json();
         setData([...data, dataOutput]);
       } catch (err) {
         console.error(err);
@@ -36,7 +36,26 @@ function ExcelSheet() {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet 1');
     XLSX.writeFile(workbook, 'excel_sheet.xlsx');
   };
-  
+
+  const renderTableHeader = () => {
+    if (data.length === 0) return null;
+
+    return Object.keys(data[0]).map((key, index) => (
+      <th key={index}>{key}</th>
+    ));
+  };
+
+  const renderTableBody = () => {
+    if (data.length === 0) return null;
+
+    return data.map((item, index) => (
+      <tr key={index}>
+        {Object.values(item).map((value, subIndex) => (
+          <td key={subIndex}>{value}</td>
+        ))}
+      </tr>
+    ));
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -47,6 +66,7 @@ function ExcelSheet() {
     <div
       style={{
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh', // Adjust the height as needed
@@ -62,26 +82,29 @@ function ExcelSheet() {
             Upload
           </Button>
         </Card.Body>
-        {data.length !== 0 ?
-        <Card.Footer> 
-          <Button onClick={exportToExcel}> Export to Excel</Button>
-        </Card.Footer> : null }
-
+        {data.length !== 0 && (
+          <Card.Footer>
+            <Button onClick={exportToExcel}>Export to Excel</Button>
+          </Card.Footer>
+        )}
       </Card>
+      <br/>
       <div>
-  {data.map((_data, index) => (
-    <Card key={index}>
-      <Card.Body>
-        filename: {_data.filename}<br/>
-        overall_tempo: {_data.overall_tempo}<br/>
-        peak_1: {_data.peak_1}<br/>
-        peak_2: {_data.peak_2}<br/>
-      </Card.Body>
-    </Card>
-  ))}
-
-</div>
-
+        <br/>
+        {data.length !== 0 && (
+          <Table responsive>
+            <thead>
+              <tr>
+                {renderTableHeader()}
+                
+              </tr>
+            </thead>
+            <tbody>
+         {renderTableBody()}
+            </tbody>
+          </Table>
+        )}
+      </div>
     </div>
   );
 }
