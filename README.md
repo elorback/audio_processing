@@ -23,6 +23,12 @@
       }
       }
 
+
+# run pip command:
+
+pip install -r requirements.txt
+
+
 # to run project cd into frontend from root directory:
 
 cd ./audio_processing/frontend
